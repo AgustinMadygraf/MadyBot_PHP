@@ -1,22 +1,35 @@
-<!--
-Path: config/database.php
-Este archivo PHP se encarga de establecer la conexión con la base de datos.
--->
 <?php
+require_once __DIR__ . '/../vendor/autoload.php';
+
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/..');
+$dotenv->load();
+
 class Database {
-    private $host = "localhost";
-    private $db_name = "mi_base_de_datos";
-    private $username = "root";
-    private $password = "";
+    private $host;
+    private $db_name;
+    private $username;
+    private $password;
     public $conn;
+
+    public function __construct() {
+        $this->host = $_ENV['DB_HOST'];
+        $this->db_name = $_ENV['DB_NAME'];
+        $this->username = $_ENV['DB_USER']; 
+        $this->password = $_ENV['DB_PASSWORD'];
+    }
 
     public function getConnection() {
         $this->conn = null;
         try {
-            $this->conn = new PDO("mysql:host=" . $this->host . ";dbname=" . $this->db_name, $this->username, $this->password);
+            $this->conn = new PDO(
+                "mysql:host=" . $this->host . ";dbname=" . $this->db_name,
+                $this->username,
+                $this->password
+            );
+            $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             $this->conn->exec("set names utf8");
         } catch (PDOException $exception) {
-            echo "Error de conexión: " . $exception->getMessage();
+            throw new Exception("Error de conexión: " . $exception->getMessage());
         }
         return $this->conn;
     }

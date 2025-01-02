@@ -1,3 +1,8 @@
+<!--
+Path: app/views/index.php
+
+-->
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -6,6 +11,9 @@
 </head>
 <body>
     <h1>Registro de URLs</h1>
+    <?php
+    echo "Mensaje actual: " . $message . "<br>"; // Muestra el mensaje generado en el controlador
+    ?>
     <form action="/index.php" method="POST">
         <label for="url">URL:</label>
         <input type="text" name="url" id="url" required />
