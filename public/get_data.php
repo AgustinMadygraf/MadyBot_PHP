@@ -1,5 +1,9 @@
 <?php
 
+require_once __DIR__ . '/../app/helpers/debug_helper.php';
+require_once __DIR__ . '/../app/models/database.php';
+
+
 /**
  * Clase EndpointValidator
  * Valida la URL del endpoint.
@@ -17,11 +21,12 @@ class EndpointValidator {
 }
 
 /**
- * Clase GetDataService
+ * Clase GetDataService 
  * Maneja la lógica para devolver datos del endpoint.
  */
 class GetDataService {
     private $validator;
+    private $conn;
 
     /**
      * Constructor
@@ -29,6 +34,24 @@ class GetDataService {
      */
     public function __construct(EndpointValidator $validator) {
         $this->validator = $validator;
+        $database = new Database();
+        $this->conn = $database->getConnection();
+    }
+
+    /**
+     * Obtiene la última URL registrada en la base de datos
+     */
+    private function getLastUrl() {
+        try {
+            $query = "SELECT url FROM urls ORDER BY id DESC LIMIT 1";
+            $stmt = $this->conn->prepare($query);
+            $stmt->execute();
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            return $result ? $result['url'] : null;
+        } catch (PDOException $e) {
+            debug_trace("Error al obtener la última URL: " . $e->getMessage());
+            throw new Exception("Error al obtener la última URL");
+        }
     }
 
     /**
@@ -39,8 +62,8 @@ class GetDataService {
         header('Content-Type: application/json; charset=utf-8');
 
         try {
-            $endpoint = 'http://192.168.0.118:5000';
-
+            $endpoint = $this->getLastUrl() ?? 'http://192.168.0.118:5000';
+            debug_trace("Endpoint obtenido: " . $endpoint);
 
             if (!$this->validator->validate($endpoint)) {
                 throw new Exception('El endpoint es inválido o está vacío');

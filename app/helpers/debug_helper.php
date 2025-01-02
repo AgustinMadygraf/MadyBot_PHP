@@ -1,7 +1,3 @@
-<!--
-Path: app/helpers/debug_helper.php
-Este archivo contiene una función para depurar la aplicación. 
--->
 
 <?php
 require_once __DIR__ . '/../../vendor/autoload.php';
