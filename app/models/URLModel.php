@@ -1,6 +1,14 @@
+<!--
+Path: app/models/URLModel.php
+
+-->
+
 <?php
-require_once __DIR__ . '/../../config/database.php';
+debug_trace("Inicializando el modelo URLModel");
 require_once __DIR__ . '/../helpers/debug_helper.php';
+debug_trace("Requeridos los archivos de ayuda");
+require_once __DIR__ . '/database.php';
+debug_trace("Requerido el archivo de la base de datos");
 
 class URLModel {
     private $conn;

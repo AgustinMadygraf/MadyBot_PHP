@@ -1,9 +1,22 @@
-<?php
-require_once __DIR__ . '/../vendor/autoload.php';
-require_once __DIR__ . '/../app/helpers/debug_helper.php';
+<!--
+Path: app/models/URLModel.php
+-->
 
-$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/..');
+<?php
+debug_trace("Inicializando el archivo de configuración de la base de datos");
+require_once __DIR__ . '/../helpers/debug_helper.php';
+debug_trace("Requerido el archivo de ayuda para depuración");
+require_once __DIR__ . '/../../vendor/autoload.php';
+debug_trace("Requerido el cargador de clases de Composer");
+
+
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../..');
+
+debug_trace("Cargando las variables de entorno");
+
 $dotenv->load();
+
+debug_trace("Cargadas las variables de entorno");
 
 class Database {
     private $host;
