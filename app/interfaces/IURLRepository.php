@@ -24,4 +24,11 @@ interface IURLRepository {
      * @return array Un arreglo de URLs.
      */
     public function getAllURLs(): array;
+
+    /**
+     * Recupera la última URL almacenada en el repositorio.
+     *
+     * @return string|null La última URL o null si no hay registros.
+     */
+    public function getLastURL(): ?string;
 }

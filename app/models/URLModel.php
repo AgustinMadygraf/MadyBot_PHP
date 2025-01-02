@@ -1,8 +1,3 @@
-<!--
-Path: app/models/URLModel.php
-Este archivo contiene la implementación de la interfaz IURLRepository para manejar operaciones de URLs.
--->
-
 <?php
 debug_trace("Incluyendo dependencias en URLModel");
 require_once __DIR__ . '/../helpers/debug_helper.php';
@@ -72,6 +67,29 @@ class URLModel implements IURLRepository {
         } catch (PDOException $e) {
             debug_trace("Excepción al obtener las URLs: " . htmlspecialchars($e->getMessage()));
             throw new Exception("Error al obtener las URLs: " . $e->getMessage());
+        }
+    }
+
+    /**
+     * Recupera la última URL almacenada en el repositorio.
+     *
+     * @return string|null La última URL o null si no hay registros.
+     * @throws Exception Si ocurre un error durante la recuperación.
+     */
+    public function getLastURL(): ?string {
+        debug_trace("Intentando recuperar la última URL");
+        try {
+            $query = "SELECT url FROM urls ORDER BY id DESC LIMIT 1";
+            debug_trace("Consulta SQL para obtener: " . $query);
+            $stmt = $this->conn->prepare($query);
+            $stmt->execute();
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            $lastURL = $result ? $result['url'] : null;
+            debug_trace("Última URL recuperada: " . ($lastURL ?? "null"));
+            return $lastURL;
+        } catch (PDOException $e) {
+            debug_trace("Excepción al obtener la última URL: " . htmlspecialchars($e->getMessage()));
+            throw new Exception("Error al obtener la última URL: " . $e->getMessage());
         }
     }
 }
