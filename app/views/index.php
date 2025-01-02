@@ -39,7 +39,7 @@ try {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registro de URLs</title>
     <link href="../public/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="icon" type="image/png" href="../public/favicon.ico">
+    <link rel="icon" type="image/png" href="../public/favicon.png">
     </head>
 <body class="bg-light">
     <div class="container mt-5">

@@ -4,23 +4,6 @@ A continuación, se detallan las tareas y subtareas necesarias para mejorar la a
 
 ---
 
-## 1. Revisar la instanciación de controladores y modelos
-
-### Descripción:
-Reemplazar la creación directa de instancias en vistas y controladores por un sistema de inyección de dependencias. Esto mejora la escalabilidad y facilita el mantenimiento.
-
-### Archivos afectados:
-- **app/views/index.php**
-- **app/views/list.php**
-- Crear un archivo nuevo: **app/bootstrap.php**
-
-### Subtareas:
-1.1. Modificar `index.php` para utilizar un archivo central que gestione la creación de controladores.  
-1.2. Crear el archivo `bootstrap.php` para instanciar controladores y modelos, gestionando las dependencias necesarias.  
-1.3. Configurar un mecanismo sencillo de inyección, asegurando que las dependencias se provean automáticamente.
-
----
-
 ## 2. Crear interfaces para el acceso a datos (ISP y DIP)
 
 ### Descripción:
