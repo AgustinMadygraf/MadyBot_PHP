@@ -1,3 +1,4 @@
 vendor/
 .env
 app/docs/00-Prompt-for-ProjectAnalysis.md
+todo.md
