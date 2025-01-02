@@ -1,10 +1,15 @@
+<!--
+Path: app/views/index.php
+
+-->
+
 <?php
-require_once __DIR__ . '/../helpers/debug_helper.php';
-require_once __DIR__ . '/../controllers/URLController.php';
+require_once __DIR__ . '/../bootstrap.php';
 
 debug_trace("Cargando la vista principal");
 
-$controller = new URLController();
+// Inicializar el controlador mediante Bootstrap
+$controller = Bootstrap::initialize();
 $message = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['url'])) {
@@ -27,16 +32,15 @@ try {
     debug_trace("Error al recuperar las URLs: " . $e->getMessage());
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registro de URLs</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-YbRj5iw1shLFhA9gCmvr7cZn6a1t+9k2eA0bBIQ1eB8ZtnAdf1IZy1Ys9RVI4oJo" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-t1C7AlhC79SX8fE6IXC2CtF00JNs3fGFeRJMeJEbgUbnFQouOH29bT30f65beQYI" crossorigin="anonymous"></script>
-</head>
+    <link href="../public/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="icon" type="image/png" href="../public/favicon.ico">
+    </head>
 <body class="bg-light">
     <div class="container mt-5">
         <h1 class="text-center">Registro de URLs</h1>
@@ -56,6 +60,5 @@ try {
             <?php endforeach; ?>
         </ul>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-VoPF6IL7AqV4ZpOhsA1xdyl2WyU4Gi5HV79A8eAhQFAfuKnDkrB/A59WgCW4X5wo" crossorigin="anonymous"></script>
 </body>
 </html>

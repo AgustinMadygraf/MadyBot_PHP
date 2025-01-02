@@ -1,5 +1,5 @@
 <!--
-Path: public/index.php
+Path: app/index.php
 
 -->
 
