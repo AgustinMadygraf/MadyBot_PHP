@@ -4,9 +4,13 @@ Este archivo contiene la implementación de la interfaz IURLRepository para mane
 -->
 
 <?php
-require_once __DIR__ . '/../interfaces/IURLRepository.php';
+debug_trace("Incluyendo dependencias en URLModel");
 require_once __DIR__ . '/../helpers/debug_helper.php';
+debug_trace("Dependencias incluidas en URLModel");
+require_once __DIR__ . '/../interfaces/IURLRepository.php';
+debug_trace("Interfaz IURLRepository incluida en URLModel");
 require_once __DIR__ . '/database.php';
+debug_trace("Clase Database incluida en URLModel");
 
 /**
  * Clase URLModel

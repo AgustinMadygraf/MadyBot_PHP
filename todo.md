@@ -1,94 +1,105 @@
 
-## 1. Aplicar el principio de Inversión de Dependencias (DIP) con repositorio de URLs
+## 1. Implementar la Inversión de Dependencias (DIP) con un repositorio de URLs
 
-- [ ] **Tarea 1.1: Crear la implementación de `IURLRepository`**  
-  - [ ] Crear un archivo nuevo, por ejemplo:  
-    `app/repositories/URLRepository.php`  
-    que implemente la interfaz `IURLRepository`.  
-  - [ ] Dentro de esta clase, inyectar la conexión a la base de datos (`PDO`) en el constructor, para que las operaciones de lectura/escritura en la tabla `urls` sean responsabilidad del repositorio.
+### 1.1. Crear un repositorio `URLRepository` que implemente `IURLRepository`
+- [x] **1.1.1 (Crear archivo)**: `app/repositories/URLRepository.php`  
+  - [x] **1.1.1.1 (Dentro de URLRepository.php)**: Definir la clase `URLRepository` que implemente la interfaz `IURLRepository`.
+  - [x] **1.1.1.2 (Dentro de URLRepository.php)**: Inyectar un objeto `PDO` en el constructor.
+  - [x] **1.1.1.3 (Dentro de URLRepository.php)**: Implementar el método `saveURL(string $url): bool`.
+  - [x] **1.1.1.4 (Dentro de URLRepository.php)**: Implementar el método `getAllURLs(): array`.
+  - [x] **1.1.1.5 (Dentro de URLRepository.php)**: Crear un método `getLastURL(): ?string` para retornar la última URL almacenada.
 
-- [ ] **Tarea 1.2: Mover la lógica de obtención de la “última URL” al repositorio**  
-  - [ ] Pasar el método que obtiene la última URL (actualmente en `GetDataService`) a un método como `getLastURL()` en `URLRepository`.  
-  - [ ] Dejar `GetDataService` libre de la lógica directa de la base de datos.
-
----
-
-## 2. Modificar `GetDataService` para inyectar `IURLRepository`
-
-- [ ] **Tarea 2.1: Eliminar la creación directa de `Database` en `GetDataService`**  
-  - [ ] En el archivo `public/get_data.php`, quitar la línea:  
-    ```php
-    $database = new Database();
-    $this->conn = $database->getConnection();
-    ```  
-  - [ ] En su lugar, inyectar en el constructor de `GetDataService` una instancia de `IURLRepository` (por ejemplo, `URLRepository`) cuando se inicialice en `get_data.php`.
-
-- [ ] **Tarea 2.2: Ajustar la llamada a `getLastURL()`**  
-  - [ ] Reemplazar la lógica de `$this->getLastUrl()` dentro de `GetDataService` para que ahora use `$this->urlRepository->getLastURL()` (o el nombre que hayas definido).  
-  - [ ] El resto del proceso (validación y respuesta JSON) sigue igual, pero leyendo ya desde el repositorio.
+### 1.2. Ajustar la interfaz `IURLRepository` para añadir `getLastURL`
+- [ ] **1.2.1 (Modificar archivo)**: `app/interfaces/IURLRepository.php`  
+  - [ ] **1.2.1.1 (Dentro de IURLRepository.php)**: Agregar la declaración del método `public function getLastURL(): ?string;` si aún no existe.
 
 ---
 
-## 3. Separar la lógica de respuesta HTTP (SRP)
+## 2. Modificar `GetDataService` para inyectar el nuevo repositorio
 
-- [ ] **Tarea 3.1: Crear un nuevo controlador o script para manejar la respuesta**  
-  - [ ] Crear un archivo nuevo, por ejemplo:  
-    `public/controllers/GetDataController.php`  
-    (o el nombre que prefieras) que se encargue de:  
-    1. Llamar a los métodos de `GetDataService` o similar.  
-    2. Configurar los encabezados `header('Content-Type: application/json; ...)`.  
-    3. Generar la respuesta HTTP final (JSON).
+### 2.1. Eliminar la creación directa de `Database` en `GetDataService`
+- [ ] **2.1.1 (Modificar archivo)**: `public/get_data.php`  
+  - [ ] **2.1.1.1**: Quitar la línea donde se instancia `new Database()` dentro de `GetDataService`.
+  - [ ] **2.1.1.2**: Crear una instancia de `URLRepository` (pasándole la conexión `PDO`).
+  - [ ] **2.1.1.3**: Inyectar esa instancia en el constructor de `GetDataService`.
 
-- [ ] **Tarea 3.2: Ajustar `get_data.php` para usar el nuevo controlador**  
-  - [ ] En `get_data.php`, instancia únicamente el controlador (p. ej. `GetDataController`) y llama el método principal que genere la respuesta.  
-  - [ ] Eliminar o reducir la lógica de respuesta dentro de `GetDataService`, para que esta clase se enfoque exclusivamente en “obtener y procesar” la información.
-
----
-
-## 4. Sustituir la función global `debug_trace()` por la interfaz `DebugInterface`
-
-- [ ] **Tarea 4.1: Decidir si se elimina o refactoriza `debug_helper.php`**  
-  - [ ] Si se opta por eliminar:  
-    - [ ] **Eliminar** el archivo `app/helpers/debug_helper.php` (o dejarlo vacío si deseas conservar el nombre).  
-    - [ ] Asegurarse de remover su inclusión en todos los lugares donde se llama a `require_once __DIR__ . '/../app/helpers/debug_helper.php'`.  
-  - [ ] Si se opta por refactorizar:  
-    - [ ] Transformarlo en una clase que implemente `DebugInterface` (en lugar de una función global).
-
-- [ ] **Tarea 4.2: Inyectar `DebugInterface` donde se necesite**  
-  - [ ] Utilizar `DebugLogger` (o la clase concreta que implementa `DebugInterface`) en `Database`, `URLRepository` y en cualquier otro lugar que requiera logs de debug.  
-  - [ ] Pasarlo vía constructor o método set, evitando funciones globales.  
-
-- [ ] **Tarea 4.3: Decidir el modo de producción vs. desarrollo**  
-  - [ ] En modo producción, se guarda el log en un archivo (ya contemplado en `DebugLogger`).  
-  - [ ] En modo desarrollo, se imprime en pantalla (también contemplado).
+### 2.2. Usar el método `getLastURL()` del repositorio en `GetDataService`
+- [ ] **2.2.1 (Modificar archivo)**: `public/get_data.php`  
+  - [ ] **2.2.1.1**: Reemplazar la llamada a `$service->getLastUrl()` para que ahora use `$service->getLastURL()` proveniente del repositorio.
+  - [ ] **2.2.1.2**: Asegurarse de que toda la lógica de obtención de la URL está delegada a `URLRepository`.
 
 ---
 
-## 5. Extraer la lógica de creación de tablas y base de datos de `Database` (OCP)
+## 3. Separar la lógica de respuesta HTTP de la lógica de negocio (SRP)
 
-- [ ] **Tarea 5.1: Evaluar si se requiere un sistema de migraciones**  
-  - [ ] Si es necesario escalar, crear un archivo nuevo, por ejemplo:  
-    `app/database/migrations/CreateURLsTable.php`  
-    que contenga la lógica de `CREATE TABLE IF NOT EXISTS ...`.  
-  - [ ] Dejar `Database` únicamente con la responsabilidad de establecer y mantener la conexión (`getConnection()`).
+### 3.1. Crear un nuevo controlador para la respuesta
+- [ ] **3.1.1 (Crear archivo)**: `public/controllers/GetDataController.php`  
+  - [ ] **3.1.1.1**: Definir la clase `GetDataController`.
+  - [ ] **3.1.1.2**: Inyectar (vía constructor) la instancia de `GetDataService` o la clase que maneje la lógica de URLs.
+  - [ ] **3.1.1.3**: Agregar un método (por ejemplo, `public function handleRequest()`) para configurar los encabezados HTTP y generar la respuesta JSON.
 
-- [ ] **Tarea 5.2: Actualizar `Database`**  
-  - [ ] Eliminar o comentar la parte de `createTable()` dentro de `Database`.  
-  - [ ] Ajustar el método `getConnection()` para que ya no llame a la creación de tablas.  
-  - [ ] Mover la lógica de `createDatabase()` a un proceso de setup o migración, si también deseas extraer esa responsabilidad.
+### 3.2. Usar el nuevo controlador en `get_data.php`
+- [ ] **3.2.1 (Modificar archivo)**: `public/get_data.php`
+  - [ ] **3.2.1.1**: Eliminar los `header(...)` de `GetDataService` y moverlos a `GetDataController`.
+  - [ ] **3.2.1.2**: Instanciar `GetDataController` y llamar a su método `handleRequest()`.
 
 ---
 
-## 6. Revisar nombres y realizar refactor final (SRP/OCP)
+## 4. Reemplazar la función global `debug_trace()` por `DebugInterface` (DIP)
 
-- [ ] **Tarea 6.1: Ajustar nombres de clases y archivos para mayor coherencia**  
-  - [ ] Por ejemplo, cambiar `GetDataService` a `URLService` o `DataService`, si describe mejor la funcionalidad.  
-  - [ ] Asegurarse de que los archivos correspondan a los nombres de las clases para mantener consistencia (psr-4, convención de nombres, etc.).
+### 4.1. Eliminar o refactorizar `debug_helper.php`
+- [ ] **4.1.1 (Eliminar archivo)**: `app/helpers/debug_helper.php`  
+  - [ ] **4.1.1.1**: Verificar dónde se está usando `require_once __DIR__ . '/../app/helpers/debug_helper.php'` y quitar esas referencias.
+  - [ ] **4.1.1.2**: Borrar `debug_helper.php` o bien vaciar su contenido para no romper rutas existentes.
 
-- [ ] **Tarea 6.2: Verificar si se necesita una interfaz para la conexión de base de datos**  
-  - [ ] Si en el futuro se planea soportar múltiples motores (MySQL, PostgreSQL, etc.), crear `DatabaseConnectionInterface` y mover la lógica de `Database` ahí.  
-  - [ ] Implementar distintas clases concretas si se requiere.
+#### (O, alternativamente)
 
-- [ ] **Tarea 6.3: Pruebas finales**  
-  - [ ] Probar que la aplicación funcione con cada refactor.  
-  - [ ] Realizar tests unitarios (si existen) o manuales para asegurarse de que todo sigue operando correctamente.
+- [ ] **4.1.2 (Modificar archivo)**: `app/helpers/debug_helper.php`
+  - [ ] **4.1.2.1**: Convertir la función global `debug_trace()` en una clase que implemente `DebugInterface` (si se decide refactorizar en lugar de eliminar).
+
+### 4.2. Inyectar `DebugInterface` en las clases que usaban `debug_trace()`
+- [ ] **4.2.1 (Modificar archivo)**: `app/models/database.php`
+  - [ ] **4.2.1.1**: Eliminar llamadas a `debug_trace()` y sustituirlas por `$this->debug->debug(...)`.
+  - [ ] **4.2.1.2**: Inyectar una instancia de `DebugInterface` en el constructor de la clase `Database`.
+
+- [ ] **4.2.2 (Modificar archivo)**: `public/get_data.php` (o el controlador correspondiente)
+  - [ ] **4.2.2.1**: Eliminar llamadas a `debug_trace()`.
+  - [ ] **4.2.2.2**: Asegurarse de que se inyecta `DebugLogger` (o la clase concreta) en los componentes que necesitan logs.
+
+---
+
+## 5. Extraer la creación de tablas y base de datos de `Database` (OCP)
+
+### 5.1. Crear archivos de migración para la tabla `urls`
+- [ ] **5.1.1 (Crear archivo)**: `app/database/migrations/CreateUrlsTable.php`
+  - [ ] **5.1.1.1**: Agregar lógica de `CREATE TABLE IF NOT EXISTS urls ...`.
+  - [ ] **5.1.1.2**: Diseñar un método estático o de instancia (p. ej., `run()`).
+
+### 5.2. Mover la creación de la base de datos a un proceso de configuración
+- [ ] **5.2.1 (Crear archivo)**: `app/database/migrations/CreateDatabase.php`
+  - [ ] **5.2.1.1**: Agregar la lógica de `CREATE DATABASE IF NOT EXISTS ...`.
+  - [ ] **5.2.1.2**: Manejar la configuración necesaria (host, usuario, etc.).
+
+### 5.3. Ajustar la clase `Database`
+- [ ] **5.3.1 (Modificar archivo)**: `app/models/database.php`
+  - [ ] **5.3.1.1**: Eliminar el método `createTable()` y toda referencia a creación de la DB.
+  - [ ] **5.3.1.2**: Conservar únicamente la lógica de `getConnection()` y `createDatabase()` **si** es que aún es obligatoria (o moverla también al nuevo archivo de migración).
+  - [ ] **5.3.1.3**: Ajustar las excepciones para no depender de la lógica de creación de tablas.
+
+---
+
+## 6. Refactor final: nombres y consistencia (SRP/OCP)
+
+### 6.1. Renombrar `GetDataService` a `URLService` (o nombre más claro)
+- [ ] **6.1.1 (Modificar archivo)**: `public/get_data.php` (o donde esté la clase)
+  - [ ] **6.1.1.1**: Cambiar el nombre de la clase de `GetDataService` a `URLService`.
+  - [ ] **6.1.1.2**: Ajustar todas las instancias donde se use `new GetDataService(...)` por `new URLService(...)`.
+
+### 6.2. Verificar coherencia en rutas y nombres de archivos
+- [ ] **6.2.1 (Modificar archivo)**: `composer.json` (si aplica PSR-4)
+  - [ ] **6.2.1.1**: Asegurarse de que el autoload PSR-4 (o el mapeo de archivos) incluya correctamente las nuevas rutas.
+
+### 6.3. Revisión final y pruebas
+- [ ] **6.3.1 (Modificar archivo)**: `public/get_data.php` (o el controlador si se renombró)
+  - [ ] **6.3.1.1**: Probar que las rutas y clases carguen correctamente.
+  - [ ] **6.3.1.2**: Confirmar que la API/servicio responde como se espera.
