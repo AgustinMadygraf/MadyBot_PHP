@@ -1,124 +1,94 @@
 
-## 1. Análisis de la aplicación de los principios SOLID
+## 1. Aplicar el principio de Inversión de Dependencias (DIP) con repositorio de URLs
 
-### 1.1 Single Responsibility Principle (SRP) — Principio de Responsabilidad Única
+- [ ] **Tarea 1.1: Crear la implementación de `IURLRepository`**  
+  - [ ] Crear un archivo nuevo, por ejemplo:  
+    `app/repositories/URLRepository.php`  
+    que implemente la interfaz `IURLRepository`.  
+  - [ ] Dentro de esta clase, inyectar la conexión a la base de datos (`PDO`) en el constructor, para que las operaciones de lectura/escritura en la tabla `urls` sean responsabilidad del repositorio.
 
-**Objetivo**: Cada clase o módulo debe tener una única responsabilidad.
-
-#### Observaciones
-
-1. **EndpointValidator**  
-   - Se encarga únicamente de validar que un endpoint sea una URL válida.  
-   - Cumple el SRP.
-
-2. **GetDataService**  
-   - Se encarga de:  
-     1. Conectarse a la base de datos (a través de `new Database()` directamente).  
-     2. Obtener la última URL almacenada.  
-     3. Validar la URL (usando `EndpointValidator`).  
-     4. Responder con datos en formato JSON.
-
-   - Potencialmente está haciendo “demasiadas cosas”: manejar la lógica de negocio, orquestar la conexión a la base de datos y realizar la respuesta HTTP. Sería deseable separar la lógica de “obtener datos” y la de “formato de respuesta HTTP”.
-
-3. **Database**  
-   - Maneja la conexión con la base de datos, su creación y la creación de la tabla `urls`.  
-   - Parece lógico que sea el responsable de la conexión y la creación de la DB, aunque idealmente las operaciones de creación de tablas podrían separarse en un mecanismo de migraciones aparte.  
-   - Este punto no necesariamente rompe SRP, pero es una oportunidad de mejorar la organización.
-
-4. **debug_helper.php** y **DebugLogger**  
-   - El archivo `debug_helper.php` define una función global `debug_trace()` que imprime o registra mensajes.  
-   - Existe también `DebugLogger` que implementa la interfaz `DebugInterface`.  
-   - Tenemos dos mecanismos diferentes de depuración (`debug_trace()` y la clase `DebugLogger`). Podría unificarse en una sola lógica de debug, inyectando la dependencia donde sea necesaria.
-
-5. **IURLRepository**  
-   - Es solo una interfaz que declara métodos para guardar y recuperar URLs. Sin embargo, no vemos una implementación concreta que la use (por ejemplo, `URLRepository` con un constructor que recibe la clase `Database` o un `PDO`).
-
-En general, hay varias clases con responsabilidades separadas, **pero** se podrían unificar y separar mejor ciertas responsabilidades:  
-- `GetDataService` se podría encargar **únicamente** de la lógica de negocio (obtener URL desde un repositorio, validarla, etc.) y no de los detalles de la base de datos.  
-- La lógica de la base de datos podría estar abstraída en un repositorio que implemente `IURLRepository`.
-
-### 1.2 Open/Closed Principle (OCP) — Principio de Abierto/Cerrado
-
-**Objetivo**: Las clases deben estar abiertas a la extensión y cerradas a la modificación.
-
-#### Observaciones
-
-1. `EndpointValidator` está abierto a extenderse: se podrían crear validaciones adicionales sin modificar el método actual, sobrescribiendo en una subclase. Sin embargo, su único método es muy simple y quizás no se justifique hoy, aunque está correctamente estructurado.
-2. `GetDataService` depende directamente de `new Database()` (una instancia concreta) en lugar de una abstracción. Esto dificulta extender su funcionalidad sin cambiar directamente su código.  
-3. `Database` y su lógica de crear tablas/bases de datos está algo “quemada” dentro de la clase. Para añadir nuevas tablas habría que modificar la clase. Es un detalle que puede romper OCP si necesitamos cambiar la forma en que creamos/gestionamos la base de datos.
-
-Una forma de mejorarlo sería utilizar **interfaces** y/o **repositorios** para la lógica de acceso a datos, de manera que `GetDataService` solo conozca un `IURLRepository`.
-
-### 1.3 Liskov Substitution Principle (LSP) — Principio de Sustitución de Liskov
-
-**Objetivo**: Las subclases deben ser sustituibles por sus superclases sin alterar el comportamiento esperado.
-
-#### Observaciones
-
-- No se ve una jerarquía de herencia relevante en el ejemplo (más allá de `DebugLogger` que implementa `DebugInterface` y `IURLRepository` que no tiene implementación concreta).  
-- Mientras no exista una implementación que viole la compatibilidad de firmas, no hay un problema aparente con LSP.  
-- Si en el futuro se crean clases derivadas de `EndpointValidator` o implementaciones de `IURLRepository`, se debe asegurar que respeten las interfaces de manera consistente.
-
-### 1.4 Interface Segregation Principle (ISP) — Principio de Segregación de Interfaces
-
-**Objetivo**: Se deben crear interfaces específicas de cliente, en lugar de interfaces “grandes” y genéricas.
-
-#### Observaciones
-
-- `IURLRepository` parece estar bien segmentada para la funcionalidad de URLs (solo define `saveURL` y `getAllURLs`).  
-- `DebugInterface` también está muy enfocada a la depuración.  
-- Por ahora no hay interfaces demasiado grandes o con métodos extra innecesarios.
-
-### 1.5 Dependency Inversion Principle (DIP) — Principio de Inversión de Dependencias
-
-**Objetivo**: Depender de abstracciones y no de implementaciones concretas.
-
-#### Observaciones
-
-1. `GetDataService` crea directamente un `Database` dentro de su constructor. Esto **viola** DIP, ya que no se inyecta una abstracción sino una clase concreta.  
-2. Sería preferible pasar un `IURLRepository` a `GetDataService` (o un `IDatabaseConnection` / `DatabaseInterface`, etc.) en lugar de crear directamente la instancia. De esa forma `GetDataService` no depende de la implementación interna de `Database`.
-
-3. `debug_helper.php` es una función global, en vez de inyectar una dependencia de `DebugInterface`. Aunque sea útil para debugging rápido, no respeta DIP, pues desde cualquier clase se podría inyectar un `DebugInterface` y centralizar la lógica de logs.
+- [ ] **Tarea 1.2: Mover la lógica de obtención de la “última URL” al repositorio**  
+  - [ ] Pasar el método que obtiene la última URL (actualmente en `GetDataService`) a un método como `getLastURL()` en `URLRepository`.  
+  - [ ] Dejar `GetDataService` libre de la lógica directa de la base de datos.
 
 ---
 
-## 2. Lista de tareas por orden de prioridad
+## 2. Modificar `GetDataService` para inyectar `IURLRepository`
 
-A continuación, se enumeran las tareas para refactorizar/ajustar el código siguiendo los principios SOLID, ordenadas de mayor a menor prioridad:
+- [ ] **Tarea 2.1: Eliminar la creación directa de `Database` en `GetDataService`**  
+  - [ ] En el archivo `public/get_data.php`, quitar la línea:  
+    ```php
+    $database = new Database();
+    $this->conn = $database->getConnection();
+    ```  
+  - [ ] En su lugar, inyectar en el constructor de `GetDataService` una instancia de `IURLRepository` (por ejemplo, `URLRepository`) cuando se inicialice en `get_data.php`.
 
-1. **(DIP)** **Inyectar dependencias en lugar de crearlas directamente**  
-   - Crear una implementación de `IURLRepository` (por ejemplo, `URLRepository`) que use la conexión de `Database`.  
-   - Inyectar `IURLRepository` en el constructor de `GetDataService`, en lugar de que `GetDataService` cree el `Database`.  
-   - Esto permitirá que `GetDataService` no dependa de la implementación interna de la base de datos.
-
-2. **(SRP)** **Separar la responsabilidad de generar la respuesta HTTP de la lógica de obtención de datos**  
-   - `GetDataService` debe enfocarse únicamente en la lógica de negocio: validar URL, obtenerla del repositorio, etc.  
-   - Mover la parte de “encabezados HTTP” y “generación del JSON” a un controlador o a un script que maneje la capa de presentación/respuesta.  
-   - Así, `GetDataService` queda con la responsabilidad única de “obtener datos” y “validarlos”.
-
-3. **(DIP)** **Reemplazar `debug_trace()` por una dependencia de `DebugInterface`**  
-   - En lugar de la función global en `debug_helper.php`, usar `DebugLogger` (o alguna otra implementación de `DebugInterface`) inyectada en las clases que necesiten logging.  
-   - Esto hace que las clases que requieran depuración dependan de la **abstracción** (`DebugInterface`) y no de una **función global**.
-
-4. **(OCP)** **Extraer la lógica de creación de tablas de la clase `Database` si es necesario**  
-   - Si a futuro se manejan migraciones o cambios más complejos en la BD, podemos crear un sistema de migraciones separado o una clase `DatabaseSetup` que se encargue de la creación de tablas.  
-   - Esto ayuda a que `Database` esté más enfocada a la conexión en sí y a que sea “cerrada para modificaciones” de cara a cambios de la estructura de la base de datos.
-
-5. **(SRP/OCP)** **Revisar la clase `Database` para su ampliación con otros motores de bases de datos**  
-   - En caso de necesitar soportar otro motor de base de datos (p. ej., PostgreSQL o SQLite), se podría crear una interfaz `DatabaseConnectionInterface` con métodos como `getConnection()`, y múltiples implementaciones.  
-   - Así, `Database` podría mantenerse “cerrada” y, para nuevas bases de datos, simplemente se crearía otra clase que implemente esa interfaz.
-
-6. **(Refactor en general)** **Revisar el uso de nombres y estructuras**  
-   - Ejemplo: `GetDataService` podría renombrarse a algo como `URLService` o similar, para ser más expresivo y dejar claro que se encarga de manejar URLs.  
-   - Un repositorio `URLRepository` que implemente `IURLRepository` y reciba la conexión al constructor para guardarla y usarla en los métodos `saveURL`, `getAllURLs`, etc.
+- [ ] **Tarea 2.2: Ajustar la llamada a `getLastURL()`**  
+  - [ ] Reemplazar la lógica de `$this->getLastUrl()` dentro de `GetDataService` para que ahora use `$this->urlRepository->getLastURL()` (o el nombre que hayas definido).  
+  - [ ] El resto del proceso (validación y respuesta JSON) sigue igual, pero leyendo ya desde el repositorio.
 
 ---
 
-## Conclusión
+## 3. Separar la lógica de respuesta HTTP (SRP)
 
-Los principios SOLID ayudan a hacer que el código sea **mantenible, extensible y testeable**. Para ello:
+- [ ] **Tarea 3.1: Crear un nuevo controlador o script para manejar la respuesta**  
+  - [ ] Crear un archivo nuevo, por ejemplo:  
+    `public/controllers/GetDataController.php`  
+    (o el nombre que prefieras) que se encargue de:  
+    1. Llamar a los métodos de `GetDataService` o similar.  
+    2. Configurar los encabezados `header('Content-Type: application/json; ...)`.  
+    3. Generar la respuesta HTTP final (JSON).
 
-1. **DIP** y **SRP** son los más urgentes: inyectar las dependencias y separar las responsabilidades de negocio y presentación (API/HTTP).  
-2. Continuar con la unificación de la lógica de depuración mediante la interfaz `DebugInterface`.  
-3. Considerar extraer la creación/gestión de tablas a otra capa (migraciones) si se prevén cambios a futuro.  
+- [ ] **Tarea 3.2: Ajustar `get_data.php` para usar el nuevo controlador**  
+  - [ ] En `get_data.php`, instancia únicamente el controlador (p. ej. `GetDataController`) y llama el método principal que genere la respuesta.  
+  - [ ] Eliminar o reducir la lógica de respuesta dentro de `GetDataService`, para que esta clase se enfoque exclusivamente en “obtener y procesar” la información.
 
+---
+
+## 4. Sustituir la función global `debug_trace()` por la interfaz `DebugInterface`
+
+- [ ] **Tarea 4.1: Decidir si se elimina o refactoriza `debug_helper.php`**  
+  - [ ] Si se opta por eliminar:  
+    - [ ] **Eliminar** el archivo `app/helpers/debug_helper.php` (o dejarlo vacío si deseas conservar el nombre).  
+    - [ ] Asegurarse de remover su inclusión en todos los lugares donde se llama a `require_once __DIR__ . '/../app/helpers/debug_helper.php'`.  
+  - [ ] Si se opta por refactorizar:  
+    - [ ] Transformarlo en una clase que implemente `DebugInterface` (en lugar de una función global).
+
+- [ ] **Tarea 4.2: Inyectar `DebugInterface` donde se necesite**  
+  - [ ] Utilizar `DebugLogger` (o la clase concreta que implementa `DebugInterface`) en `Database`, `URLRepository` y en cualquier otro lugar que requiera logs de debug.  
+  - [ ] Pasarlo vía constructor o método set, evitando funciones globales.  
+
+- [ ] **Tarea 4.3: Decidir el modo de producción vs. desarrollo**  
+  - [ ] En modo producción, se guarda el log en un archivo (ya contemplado en `DebugLogger`).  
+  - [ ] En modo desarrollo, se imprime en pantalla (también contemplado).
+
+---
+
+## 5. Extraer la lógica de creación de tablas y base de datos de `Database` (OCP)
+
+- [ ] **Tarea 5.1: Evaluar si se requiere un sistema de migraciones**  
+  - [ ] Si es necesario escalar, crear un archivo nuevo, por ejemplo:  
+    `app/database/migrations/CreateURLsTable.php`  
+    que contenga la lógica de `CREATE TABLE IF NOT EXISTS ...`.  
+  - [ ] Dejar `Database` únicamente con la responsabilidad de establecer y mantener la conexión (`getConnection()`).
+
+- [ ] **Tarea 5.2: Actualizar `Database`**  
+  - [ ] Eliminar o comentar la parte de `createTable()` dentro de `Database`.  
+  - [ ] Ajustar el método `getConnection()` para que ya no llame a la creación de tablas.  
+  - [ ] Mover la lógica de `createDatabase()` a un proceso de setup o migración, si también deseas extraer esa responsabilidad.
+
+---
+
+## 6. Revisar nombres y realizar refactor final (SRP/OCP)
+
+- [ ] **Tarea 6.1: Ajustar nombres de clases y archivos para mayor coherencia**  
+  - [ ] Por ejemplo, cambiar `GetDataService` a `URLService` o `DataService`, si describe mejor la funcionalidad.  
+  - [ ] Asegurarse de que los archivos correspondan a los nombres de las clases para mantener consistencia (psr-4, convención de nombres, etc.).
+
+- [ ] **Tarea 6.2: Verificar si se necesita una interfaz para la conexión de base de datos**  
+  - [ ] Si en el futuro se planea soportar múltiples motores (MySQL, PostgreSQL, etc.), crear `DatabaseConnectionInterface` y mover la lógica de `Database` ahí.  
+  - [ ] Implementar distintas clases concretas si se requiere.
+
+- [ ] **Tarea 6.3: Pruebas finales**  
+  - [ ] Probar que la aplicación funcione con cada refactor.  
+  - [ ] Realizar tests unitarios (si existen) o manuales para asegurarse de que todo sigue operando correctamente.
