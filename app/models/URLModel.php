@@ -1,16 +1,18 @@
 <!--
 Path: app/models/URLModel.php
-
+Este archivo contiene la implementación de la interfaz IURLRepository para manejar operaciones de URLs.
 -->
 
 <?php
-debug_trace("Inicializando el modelo URLModel");
+require_once __DIR__ . '/../interfaces/IURLRepository.php';
 require_once __DIR__ . '/../helpers/debug_helper.php';
-debug_trace("Requeridos los archivos de ayuda");
 require_once __DIR__ . '/database.php';
-debug_trace("Requerido el archivo de la base de datos");
 
-class URLModel {
+/**
+ * Clase URLModel
+ * Implementa la interfaz IURLRepository para manejar operaciones de URLs.
+ */
+class URLModel implements IURLRepository {
     private $conn;
 
     public function __construct() {
@@ -24,7 +26,14 @@ class URLModel {
         }
     }
 
-    public function saveURL($url) {
+    /**
+     * Guarda una URL en el repositorio.
+     *
+     * @param string $url La URL a guardar.
+     * @return bool True si se guardó correctamente, False en caso contrario.
+     * @throws Exception Si ocurre un error durante el guardado.
+     */
+    public function saveURL(string $url): bool {
         debug_trace("Intentando guardar la URL: " . htmlspecialchars($url));
         try {
             $query = "INSERT INTO urls (url, fecha_registro) VALUES (:url, NOW())";
@@ -40,7 +49,13 @@ class URLModel {
         }
     }
 
-    public function getAllURLs() {
+    /**
+     * Recupera todas las URLs almacenadas en el repositorio.
+     *
+     * @return array Un arreglo de URLs.
+     * @throws Exception Si ocurre un error durante la recuperación.
+     */
+    public function getAllURLs(): array {
         debug_trace("Intentando recuperar todas las URLs");
         try {
             $query = "SELECT * FROM urls ORDER BY id DESC";
