@@ -1,3 +1,6 @@
+<!--
+Path: app/helpers/debug_helper.php
+-->
 
 <?php
 require_once __DIR__ . '/../../vendor/autoload.php';
