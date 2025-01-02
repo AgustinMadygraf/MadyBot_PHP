@@ -4,14 +4,7 @@ Path: public/index.php
 -->
 
 <?php
-// Función de depuración
-function debug_trace($message) {
-    $trace = debug_backtrace();
-    $caller = $trace[0];
-    echo "<p style='color:blue;'><strong>Debug:</strong> $message<br>";
-    echo "Archivo: " . $caller['file'] . "<br>";
-    echo "Línea: " . $caller['line'] . "</p>";
-}
+require_once __DIR__ . '/../app/helpers/debug_helper.php';
 
 debug_trace("Iniciando la ejecución");
 
@@ -34,7 +27,7 @@ try {
         $message = "<p style='color:green;'>URL guardada exitosamente</p>";
     }
     $urls = $controller->getAllURLs();
-    debug_trace("URLs recuperadas: " . json_encode($urls)); // Usamos json_encode para facilitar la visualización
+    debug_trace("URLs recuperadas: " . json_encode($urls));
 } catch (Exception $e) {
     debug_trace("Excepción capturada: " . htmlspecialchars($e->getMessage()));
     $message = "<p style='color:red;'>Error: " . htmlspecialchars($e->getMessage()) . "</p>";

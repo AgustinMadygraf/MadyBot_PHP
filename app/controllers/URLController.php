@@ -5,31 +5,32 @@ Path: app/controllers/URLController.php
 
 <?php
 require_once __DIR__ . '/../models/URLModel.php';
+require_once __DIR__ . '/../helpers/debug_helper.php'; // Incluir el helper de depuración
 
 class URLController {
     private $model;
 
     public function __construct() {
-        echo "Inicializando el controlador URLController<br>";
+        debug_trace("Inicializando el controlador URLController");
         $this->model = new URLModel();
-        echo "Modelo URLModel instanciado<br>";
+        debug_trace("Modelo URLModel instanciado");
     }
 
     public function saveURL($url) {
-        echo "Intentando guardar la URL: " . htmlspecialchars($url) . "<br>";
+        debug_trace("Intentando guardar la URL: " . htmlspecialchars($url));
         if (filter_var($url, FILTER_VALIDATE_URL)) {
-            echo "URL válida<br>";
+            debug_trace("URL válida");
             return $this->model->saveURL($url);
         } else {
-            echo "URL inválida: " . htmlspecialchars($url) . "<br>";
+            debug_trace("URL inválida: " . htmlspecialchars($url));
             throw new Exception("La URL ingresada no es válida");
         }
     }
 
     public function getAllURLs() {
-        echo "Recuperando todas las URLs<br>";
+        debug_trace("Recuperando todas las URLs");
         $urls = $this->model->getAllURLs();
-        echo "URLs recuperadas: <pre>" . print_r($urls, true) . "</pre>";
+        debug_trace("URLs recuperadas: " . json_encode($urls));
         return $urls;
     }
 }

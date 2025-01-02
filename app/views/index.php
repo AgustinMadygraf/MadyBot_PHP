@@ -3,6 +3,11 @@ Path: app/views/index.php
 
 -->
 
+<?php
+require_once __DIR__ . '/../helpers/debug_helper.php';
+debug_trace("Cargando la vista principal");
+?>
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -12,7 +17,8 @@ Path: app/views/index.php
 <body>
     <h1>Registro de URLs</h1>
     <?php
-    echo "Mensaje actual: " . $message . "<br>"; // Muestra el mensaje generado en el controlador
+    debug_trace("Mostrando mensaje actual");
+    echo "Mensaje actual: " . $message . "<br>";
     ?>
     <form action="/index.php" method="POST">
         <label for="url">URL:</label>
@@ -20,6 +26,9 @@ Path: app/views/index.php
         <button type="submit">Guardar</button>
     </form>
     <hr>
-    <?php require_once 'list.php'; ?>
+    <?php
+    debug_trace("Incluyendo lista de URLs");
+    require_once 'list.php';
+    ?>
 </body>
 </html>
