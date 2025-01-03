@@ -1,7 +1,3 @@
-<!--
-Path: public/get_data.php
--->
-
 <?php
 
 require_once __DIR__ . '/../app/helpers/debug_helper.php';

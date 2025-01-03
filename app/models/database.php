@@ -1,7 +1,3 @@
-<!--
-Path: app/models/database.php
--->
-
 <?php
 debug_trace("Inicializando el archivo de configuración de la base de datos");
 require_once __DIR__ . '/../helpers/debug_helper.php';
