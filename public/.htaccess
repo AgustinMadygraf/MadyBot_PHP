@@ -1,0 +1,2 @@
+RewriteEngine On
+RewriteRule ^health-check$ health_check.php [L]
