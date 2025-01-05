@@ -53,7 +53,10 @@ class Database {
                 $this->createDatabase();
                 return $this->getConnection(); // Reintentar la conexión después de crear la base de datos
             }
-            throw new Exception("Error de conexión: " . $exception->getMessage());
+            $errorInfo = $exception->errorInfo;
+            $errorCode = $exception->getCode();
+            debug_trace("Código de error: " . $errorCode . " | Información del error: " . json_encode($errorInfo));
+            throw new Exception("Error de conexión: " . $exception->getMessage() . " | Código de error: " . $errorCode . " | Información del error: " . json_encode($errorInfo));
         }
         return $this->conn;
     }
