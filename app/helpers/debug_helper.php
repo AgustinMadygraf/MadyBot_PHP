@@ -1,7 +1,15 @@
 <?php
 require_once __DIR__ . '/../../vendor/autoload.php';
 
-$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../../');
+// Determinar el archivo .env a cargar
+$envFile = __DIR__ . '/../../.env';
+if (file_exists(__DIR__ . '/../../.env.development')) {
+    $envFile = __DIR__ . '/../../.env.development';
+} elseif (file_exists(__DIR__ . '/../../.env.production')) {
+    $envFile = __DIR__ . '/../../.env.production';
+}
+
+$dotenv = Dotenv\Dotenv::createImmutable(dirname($envFile), basename($envFile));
 $dotenv->load();
 
 function debug_trace($message) {

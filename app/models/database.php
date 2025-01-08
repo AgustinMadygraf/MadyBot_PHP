@@ -1,13 +1,19 @@
 <?php
-debug_trace("Inicializando el archivo de configuración de la base de datos");
 require_once __DIR__ . '/../helpers/debug_helper.php';
-debug_trace("Requerido el archivo de ayuda para depuración");
+debug_trace("Inicializando el archivo de configuración de la base de datos");
+
 require_once __DIR__ . '/../../vendor/autoload.php';
 debug_trace("Requerido el cargador de clases de Composer");
 
+// Determinar el archivo .env a cargar
+$envFile = __DIR__ . '/../../.env';
+if (file_exists(__DIR__ . '/../../.env.development')) {
+    $envFile = __DIR__ . '/../../.env.development';
+} elseif (file_exists(__DIR__ . '/../../.env.production')) {
+    $envFile = __DIR__ . '/../../.env.production';
+}
 
-$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../..');
-
+$dotenv = Dotenv\Dotenv::createImmutable(dirname($envFile), basename($envFile));
 debug_trace("Cargando las variables de entorno");
 
 $dotenv->load();

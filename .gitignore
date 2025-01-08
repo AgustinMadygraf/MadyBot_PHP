@@ -1,3 +1,5 @@
 vendor/
 .env
 app/docs/00-Prompt-for-ProjectAnalysis.md
+.env.production
+.env.development
