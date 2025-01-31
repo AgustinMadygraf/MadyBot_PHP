@@ -1,4 +1,6 @@
 <?php
+/* Path: app/models/URLModel.php */
+
 debug_trace("Incluyendo dependencias en URLModel");
 require_once __DIR__ . '/../helpers/debug_helper.php';
 debug_trace("Dependencias incluidas en URLModel");

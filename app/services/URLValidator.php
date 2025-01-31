@@ -1,9 +1,5 @@
-<!--
-Path: app/services/URLValidator.php
-
--->
-
 <?php
+/* Path: app/services/URLValidator.php */
 
 /**
  * Clase URLValidator

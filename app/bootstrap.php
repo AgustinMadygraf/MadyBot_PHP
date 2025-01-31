@@ -1,9 +1,5 @@
-<!--
-Path: app/bootstrap.php
-
--->
-
 <?php
+/* Path: app/bootstrap.php */
 
 require_once __DIR__ . '/helpers/debug_helper.php';
 require_once __DIR__ . '/models/URLModel.php';

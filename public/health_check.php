@@ -1,4 +1,6 @@
 <?php
+/* Path: public/health_check.php */
+
 header('Content-Type: application/json');
 
 $response = [

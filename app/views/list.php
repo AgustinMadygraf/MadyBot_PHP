@@ -1,9 +1,6 @@
-<!--
-Path: app/views/list.php
-
--->
-
 <?php
+/* Pth: app/views/list.php */
+
 require_once __DIR__ . '/../bootstrap.php';
 
 debug_trace("Cargando la vista de listado");

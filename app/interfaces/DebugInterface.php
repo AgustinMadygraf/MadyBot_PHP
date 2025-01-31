@@ -1,4 +1,5 @@
 <?php
+/* Path: app/Interfaces/DebugInterface.php */
 
 namespace App\Interfaces;
 

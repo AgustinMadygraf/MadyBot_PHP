@@ -1,4 +1,5 @@
 <?php
+/* Path: public/get_data.php */
 
 require_once __DIR__ . '/../app/helpers/debug_helper.php';
 require_once __DIR__ . '/../app/models/database.php';

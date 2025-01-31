@@ -1,4 +1,6 @@
 <?php
+/* Path: app/helpers/debug_helper.php */
+
 require_once __DIR__ . '/../../vendor/autoload.php';
 
 // Determinar el archivo .env a cargar

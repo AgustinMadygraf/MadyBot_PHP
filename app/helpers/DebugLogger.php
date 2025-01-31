@@ -1,4 +1,5 @@
 <?php
+/* Path: app/helpers/DebugLogger.php */
 
 namespace App\Helpers;
 

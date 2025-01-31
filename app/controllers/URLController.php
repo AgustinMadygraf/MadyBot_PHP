@@ -1,9 +1,6 @@
-<!--
-Path: app/controllers/URLController.php
-
--->
-
 <?php
+/* Path: app/controllers/URLController.php */
+
 debug_trace("Incluyendo dependencias en URLController");
 require_once __DIR__ . '/../helpers/debug_helper.php';
 debug_trace("Dependencias incluidas en URLController");

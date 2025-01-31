@@ -1,9 +1,6 @@
-<!--
-Path: app/views/index.php
-
--->
-
 <?php
+/* Path: app/views/index.php */
+
 require_once __DIR__ . '/../bootstrap.php';
 
 debug_trace("Cargando la vista principal");

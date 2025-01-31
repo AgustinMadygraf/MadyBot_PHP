@@ -1,9 +1,5 @@
-<!--
-Path: app/interfaces/IURLRepository.php
-
--->
-
 <?php
+/*Path: app/Interfaces/IURLRepository.php*/
 
 /**
  * Interface IURLRepository

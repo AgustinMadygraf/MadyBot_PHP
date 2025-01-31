@@ -1,4 +1,5 @@
 <?php
+/* Path: public/get_data.php */
 
 /**
  * Clase EndpointValidator
