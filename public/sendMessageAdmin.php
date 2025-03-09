@@ -194,7 +194,7 @@ class MessageHandler {
 
 // Configuración del bot y resolución del endpoint FastAPI
 $TELEGRAM_BOT_TOKEN = $_ENV['TELEGRAM_BOT_TOKEN'] ?? '';
-$TELEGRAM_CHAT_ID   = "593052206";
+$TELEGRAM_CHAT_ID   = "593052206"; // ID de chat de Telegram que deberá ser obtenido por un GET o por un POST
 
 try {
     $database = new Database();
