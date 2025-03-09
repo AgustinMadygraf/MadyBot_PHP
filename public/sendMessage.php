@@ -61,8 +61,17 @@ class TelegramClient {
         $context = stream_context_create($options);
         $response = file_get_contents($telegramUrl, false, $context);
         if ($response === false) {
-            error_log("TelegramClient: No se obtuvo respuesta del API de Telegram.");
-            return ["ok" => false, "error" => "Sin respuesta de Telegram."];
+            $errorInfo = error_get_last();
+            $httpHeaders = isset($http_response_header) ? $http_response_header : [];
+            error_log("TelegramClient: No se obtuvo respuesta del API de Telegram. Error: " . json_encode($errorInfo) . " Headers: " . json_encode($httpHeaders));
+            return [
+                "ok" => false,
+                "error" => "Sin respuesta de Telegram.",
+                "debug" => [
+                    "error" => $errorInfo,
+                    "headers" => $httpHeaders
+                ]
+            ];
         }
         $responseData = json_decode($response, true);
         if (!isset($responseData["ok"]) || !$responseData["ok"]) {
@@ -143,10 +152,27 @@ class MessageHandler {
     public function process(string $message): array {
         $telegramResponse = $this->telegramClient->sendMessage($message);
         if (!isset($telegramResponse["ok"]) || !$telegramResponse["ok"]) {
-            return ["error" => "Error al enviar mensaje a Telegram: " . ($telegramResponse["description"] ?? "Sin detalle")];
+            $debug = $telegramResponse["debug"] ?? [];
+            $errorMsg = $debug["error"]["message"] ?? "Sin detalle";
+            $headerInfo = isset($debug["headers"]) ? implode(" | ", $debug["headers"]) : "";
+            if ($headerInfo) {
+                $errorMsg .= " Headers: " . $headerInfo;
+            }
+            $errorDesc = $telegramResponse["description"] ?? $errorMsg;
+            return [
+                "error" => "Error al enviar mensaje a Telegram.",
+                "detail" => $errorDesc,
+                "telegram_response" => $telegramResponse
+            ];
         }
         $fastApiResponse = $this->fastAPIClient->sendMessage($message);
-        return ["reply" => $fastApiResponse["reply"] ?? "No se recibió respuesta del bot."];
+        if (!isset($fastApiResponse["reply"])) {
+            return [
+                "error" => "Error al comunicarse con FastAPI.",
+                "detail" => $fastApiResponse
+            ];
+        }
+        return ["reply" => $fastApiResponse["reply"]];
     }
 }
 
