@@ -4,3 +4,4 @@ app/docs/00-Prompt-for-ProjectAnalysis.md
 .env.production
 .env.development
 logs/
+cache/url_cache.json
