@@ -1,5 +1,5 @@
 <?php
-/* path: webhook/index.php */
+/* Path: webhook/index.php */
 
 // Declarar el modo estricto de PHP
 declare(strict_types=1);
@@ -7,8 +7,12 @@ declare(strict_types=1);
 // Archivo: webhook/index.php
 // Propósito: Manejar eventos entrantes desde servicios externos.
 
-// Incluir archivo de configuración
+// Configurar cabeceras HTTP para respuestas JSON
+header('Content-Type: application/json');
+
+// Incluir dependencias necesarias
 require_once __DIR__ . '/../config.php';
+require_once __DIR__ . '/../vendor/autoload.php';
 
 // Incluir la clase Logger
 use App\Lib\Logger;
@@ -52,6 +56,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $logger->info('Webhook procesado correctamente');
     echo ApiResponse::success(null, 'Webhook procesado correctamente');
 } else {
+    // Enviar encabezado Allow para métodos no permitidos
+    header('Allow: POST');
     $logger->warning(sprintf('Método no permitido: %s', $_SERVER['REQUEST_METHOD']));
     echo ApiResponse::error('Método no permitido', 405);
+    exit;
 }

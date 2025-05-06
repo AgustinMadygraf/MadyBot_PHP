@@ -72,4 +72,10 @@ class Logger {
     public function debug(string $message): void {
         $this->log('debug', $message);
     }
+
+    public function setLogLevel(string $level): void {
+        if (isset($this->logLevels[strtolower($level)])) {
+            $this->currentLogLevel = $this->logLevels[strtolower($level)];
+        }
+    }
 }
