@@ -30,12 +30,9 @@ if (file_exists(__DIR__ . '/../../.env.development')) {
     $envFile = __DIR__ . '/../../.env.production';
 }
 
-$dotenv = Dotenv\Dotenv::createImmutable(dirname($envFile), basename($envFile));
-debug_trace("Cargando las variables de entorno");
+require_once __DIR__ . '/../Config/Environment.php';
 
-$dotenv->load();
-
-debug_trace("Cargadas las variables de entorno");
+use App\Config\Environment;
 
 class Database {
     private $host;
@@ -46,10 +43,11 @@ class Database {
 
     public function __construct() {
         debug_trace("Inicializando la clase Database");
-        $this->host = $_ENV['DB_HOST'];
-        $this->db_name = $_ENV['DB_NAME'];
-        $this->username = $_ENV['DB_USER'];
-        $this->password = $_ENV['DB_PASSWORD'];
+        $env = Environment::getInstance();
+        $this->host = $env->get('DB_HOST');
+        $this->db_name = $env->get('DB_NAME');
+        $this->username = $env->get('DB_USER');
+        $this->password = $env->get('DB_PASSWORD');
         debug_trace("Configuración de conexión cargada");
     }
 

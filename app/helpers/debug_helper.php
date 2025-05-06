@@ -17,7 +17,9 @@ if (!file_exists($autoloadPath)) {
 }
 
 require_once($autoloadPath);
+require_once __DIR__ . '/../Config/Environment.php';
 
+use App\Config\Environment;
 
 // Determinar el archivo .env a cargar
 $envFile = __DIR__ . '/../../.env';
@@ -31,7 +33,8 @@ $dotenv = Dotenv\Dotenv::createImmutable(dirname($envFile), basename($envFile));
 $dotenv->load();
 
 function debug_trace($message) {
-    if ($_ENV['APP_ENV_PRODUCTION'] !== 'true') {
+    $env = Environment::getInstance();
+    if ($env->get('APP_ENV_PRODUCTION', 'false') !== 'true') {
         $trace = debug_backtrace();
         $caller = $trace[0];
         echo "<p style='color:blue;'><strong>Debug:</strong> $message<br>";

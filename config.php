@@ -14,28 +14,16 @@ use App\Lib\Logger;
 // Incluir la conexión a la base de datos
 require_once __DIR__ . '/app/models/database.php';
 
+// Incluir la clase Environment
+require_once __DIR__ . '/app/Config/Environment.php';
+use App\Config\Environment;
+
 // Inicializar el logger
 $logger = Logger::getInstance();
 $logger->info('Configuración cargada correctamente.');
 
-// Función para cargar variables de entorno desde un archivo .env
-function loadEnv(string $envPath = __DIR__ . '/.env'): void {
-    if (!file_exists($envPath)) {
-        throw new Exception("El archivo .env no existe. Por favor, crea uno basado en .env.example.");
-    }
-    $lines = file($envPath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-    foreach ($lines as $line) {
-        if (strpos(trim($line), '#') === 0) continue;
-        list($name, $value) = array_map('trim', explode('=', $line, 2));
-        if (!array_key_exists($name, $_ENV)) {
-            putenv("{$name}={$value}");
-            $_ENV[$name] = $value;
-        }
-    }
-}
-
-// Cargar variables de entorno
-loadEnv();
+// Inicializar la clase Environment
+$env = Environment::getInstance();
 
 // Función para leer la URL desde caché si existe y es válida
 function getUrlFromCache(): ?string {
@@ -94,4 +82,4 @@ function getEndpointUrl(): string {
 }
 
 // Reemplazar la constante FORWARDING_URL por una variable
-$forwardingUrl = getEndpointUrl();
+$forwardingUrl = $env->get('FORWARDING_URL', getEndpointUrl());
