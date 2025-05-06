@@ -13,6 +13,7 @@ require_once __DIR__ . '/../config.php';
 // Incluir la clase Logger
 use App\Lib\Logger;
 use App\Services\WebhookValidator;
+use App\Http\ApiResponse;
 
 // Inicializar el logger
 $logger = Logger::getInstance();
@@ -31,8 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (json_last_error() !== JSON_ERROR_NONE) {
         $logger->error('El payload no es un JSON válido.');
-        http_response_code(400);
-        echo 'El payload no es un JSON válido.';
+        echo ApiResponse::error('El payload no es un JSON válido.', 400);
         exit;
     }
 
@@ -40,8 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!$validator->validate($payload)) {
         $errors = $validator->getErrors();
         $logger->error('Errores de validación: ' . implode(', ', $errors));
-        http_response_code(400);
-        echo 'Errores de validación: ' . implode(', ', $errors);
+        echo ApiResponse::error('Errores de validación.', 400, $errors);
         exit;
     }
 
@@ -51,9 +50,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // ... lógica personalizada ...
 
     $logger->info('Webhook procesado correctamente');
-    echo 'Webhook procesado correctamente';
+    echo ApiResponse::success(null, 'Webhook procesado correctamente');
 } else {
     $logger->warning(sprintf('Método no permitido: %s', $_SERVER['REQUEST_METHOD']));
-    http_response_code(405);
-    echo 'Método no permitido';
+    echo ApiResponse::error('Método no permitido', 405);
 }
