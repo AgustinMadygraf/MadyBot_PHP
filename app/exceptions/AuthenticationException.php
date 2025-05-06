@@ -4,6 +4,7 @@
 namespace App\Exceptions;
 
 use Exception;
+use Http\StatusCode;
 
 /**
  * Class AuthenticationException
@@ -11,5 +12,13 @@ use Exception;
  */
 class AuthenticationException extends Exception
 {
-    // Custom logic or properties for authentication exceptions can be added here
+    /**
+     * Get the associated HTTP status code for this exception.
+     *
+     * @return int
+     */
+    public function getStatusCode(): int
+    {
+        return StatusCode::getCode('unauthorized'); // Example mapping
+    }
 }

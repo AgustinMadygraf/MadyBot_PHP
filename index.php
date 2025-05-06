@@ -1,4 +1,6 @@
 <?php
+/* Path: index.php  */
+
 // Declarar el modo estricto de PHP
 declare(strict_types=1);
 
@@ -8,10 +10,21 @@ declare(strict_types=1);
 // Incluir la clase Logger
 require_once __DIR__ . '/lib/Logger.php';
 use App\Lib\Logger;
+use Http\StatusCode;
 
 // Inicializar el logger
 $logger = Logger::getInstance();
 $logger->info('Página principal cargada.');
+
+// Simulate a scenario to demonstrate HTTP status code usage
+try {
+    // Example: Simulate a successful operation
+    http_response_code(StatusCode::getCode('success'));
+} catch (Exception $e) {
+    // Log the error and send an appropriate HTTP status code
+    $logger->error('Error en la página principal: ' . $e->getMessage());
+    http_response_code(StatusCode::getCode('internal_server_error'));
+}
 
 ?>
 <!DOCTYPE html>
