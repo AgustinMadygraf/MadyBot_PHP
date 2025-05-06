@@ -3,7 +3,7 @@
 
 require_once __DIR__ . '/../app/helpers/debug_helper.php';
 require_once __DIR__ . '/../app/models/database.php';
-
+use App\ErrorHandlers\WebhookErrorHandler;
 
 /**
  * Clase EndpointValidator
@@ -77,7 +77,7 @@ class GetDataService {
 
             echo json_encode($data);
         } catch (Exception $e) {
-            http_response_code(500);
+            WebhookErrorHandler::handle($e);
             $errorData = [
                 'error' => 'Error al obtener endpoint',
                 'message' => $e->getMessage()

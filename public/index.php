@@ -26,6 +26,7 @@ require_once($autoloadPath);
 require_once __DIR__ . '/../app/controllers/URLController.php';
 require_once __DIR__ . '/../app/models/URLModel.php';
 require_once __DIR__ . '/../app/services/URLValidator.php';
+use App\ErrorHandlers\WebhookErrorHandler;
 
 debug_trace("Iniciando la ejecución de index.php");
 
@@ -45,7 +46,7 @@ try {
     }
     $urls = $controller->getAllURLs();
 } catch (Exception $e) {
-    debug_trace("Excepción capturada: " . htmlspecialchars($e->getMessage()));
+    WebhookErrorHandler::handle($e);
     $message = "<p style='color:red;'>Error: " . htmlspecialchars($e->getMessage()) . "</p>";
 }
 

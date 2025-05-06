@@ -9,6 +9,8 @@ header('Content-Type: application/json');
 
 require_once __DIR__ . '/../app/helpers/debug_helper.php';
 
+use App\ErrorHandlers\WebhookErrorHandler;
+
 $autoloadPath = __DIR__ . '/../vendor/autoload.php';
 
 if (!file_exists($autoloadPath)) {
@@ -28,6 +30,7 @@ require_once($autoloadPath);
 require_once __DIR__ . '/../app/controllers/URLController.php';
 require_once __DIR__ . '/../app/models/URLModel.php';
 require_once __DIR__ . '/../app/services/URLValidator.php';
+require_once __DIR__ . '/../app/ErrorHandlers/WebhookErrorHandler.php';
 
 debug_trace("Iniciando la ejecución de form.php");
 
@@ -49,5 +52,6 @@ try {
     $controller->saveURL($url);
     echo json_encode(["success" => "URL guardada exitosamente."]);
 } catch (Exception $e) {
+    WebhookErrorHandler::handle($e);
     echo json_encode(["error" => $e->getMessage()]);
 }
